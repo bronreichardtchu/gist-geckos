@@ -80,7 +80,7 @@ def prepareSpectralTemplateLibrary(
     # SSP model library
     sp_models = glob.glob(
         os.path.join(config["GENERAL"]["TEMPLATE_DIR"], config[module_used]["LIBRARY"])
-        + "*.dat"
+        + "spectra*.dat*"
     )
 
     sp_models.sort()
