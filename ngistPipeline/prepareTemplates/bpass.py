@@ -40,7 +40,7 @@ def age_metal_alpha(passedFiles):
     for ff, file in enumerate(files):
         a = file.find(".a")
         if a == -1:
-            alpha_str = np.append(alpha_str, "a+00")
+            alpha_str = np.append(alpha_str, "")
             Alpha[ff] = 0.0
         else:
             alpha_str = np.append(alpha_str, file[a + 1 : a + 5])
