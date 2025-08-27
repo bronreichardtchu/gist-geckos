@@ -25,7 +25,8 @@ def age_metal_alpha(passedFiles):
     Function to extract the values of age, metallicity, and alpha-enhancement
     from standard BPASS filenames. Note that this function can automatically
     distinguish between template libraries that do or do not include
-    alpha-enhancement.
+    alpha-enhancement. If no alpha-enhancement is included in the filenames (e.g.
+    for BPASS v2.2.1), the function will set alpha=0.0 for all templates.
     """
 
     files = []
@@ -38,8 +39,12 @@ def age_metal_alpha(passedFiles):
     alpha_str = np.array([], dtype="str")
     for ff, file in enumerate(files):
         a = file.find(".a")
-        alpha_str = np.append(alpha_str, file[a + 1 : a + 5])
-        Alpha[ff] = float(file[a + 2 : a + 5])
+        if a == -1:
+            alpha_str = np.append(alpha_str, "a+00")
+            Alpha[ff] = 0.0
+        else:
+            alpha_str = np.append(alpha_str, file[a + 1 : a + 5])
+            Alpha[ff] = float(file[a + 2 : a + 5])
 
         z = file.find(".z")
         metal_str = np.append(metal_str, file[z + 1 : z + 5])
