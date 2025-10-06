@@ -55,7 +55,16 @@ def age_metal_alpha(passedFiles):
         else:
             Metal[ff] = 1.0e-3 * float(z)
 
+    # age in log10(years)
     Age = np.arange(6, 11 + 0.1, 0.1)
+
+    # convert to Gyr 
+    Age = 10**Age / 1e9
+
+    # take the log of the age in Gyr (to be consistent with other template 
+    # libraries)
+    Age = np.log10(Age)
+
     Metal = np.unique(Metal)
     Alpha = np.unique(Alpha)
     metal_str = np.unique(metal_str)
