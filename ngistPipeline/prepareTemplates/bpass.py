@@ -20,7 +20,7 @@ listAlpha = np.array([0.0])
 # ages = agesAll[timeSteps]
 
 
-def age_metal_alpha(passedFiles):
+def age_metal_alpha(passedFiles, age_min_gyr=None, age_max_gyr=None):
     """
     Function to extract the values of age, metallicity, and alpha-enhancement
     from standard BPASS filenames. Note that this function can automatically
@@ -64,6 +64,14 @@ def age_metal_alpha(passedFiles):
     # take the log of the age in Gyr (to be consistent with other template 
     # libraries)
     Age = np.log10(Age)
+
+    # filter age range if requested
+    if age_min_gyr is not None:
+        age_min = np.log10(age_min_gyr)
+        Age = Age[Age >= age_min]
+    if age_max_gyr is not None:
+        age_max = np.log10(age_max_gyr)
+        Age = Age[Age <= age_max]
 
     Metal = np.unique(Metal)
     Alpha = np.unique(Alpha)
