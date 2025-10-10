@@ -237,7 +237,10 @@ def prepareSpectralTemplateLibrary(
             nMetal,
             nAlpha,
             ncomb,
-        ) = age_metal_alpha(sp_models)
+        ) = age_metal_alpha(sp_models, 
+                            age_min_gyr=age_min_gyr, 
+                            age_max_gyr=age_max_gyr
+                            )
 
         templates = np.zeros((sspNew.size, nAges, nMetal, nAlpha))
         templates[:, :, :, :] = np.nan
