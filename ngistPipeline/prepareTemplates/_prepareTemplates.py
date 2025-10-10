@@ -35,31 +35,67 @@ def prepareTemplates_Module(
         printStatus.failed(message)
         logging.critical(message)
         return "SKIP"
+    
+    # if the BPASS module is used, check if age range is specified
+    if config[module_used]["TEMPLATE_SET"].lower() == "bpass":
+        age_min_gyr = config[module_used].get("AGE_MIN_GYR", None)
+        age_max_gyr = config[module_used].get("AGE_MAX_GYR", None)
+        # convert to float if not None
+        if age_min_gyr is not None:
+            age_min_gyr = float(age_min_gyr)
+        if age_max_gyr is not None:
+            age_max_gyr = float(age_max_gyr)
 
     # Execute the chosen prepareTemplates routine
     try:
-        (
-            templates,
-            lamRange_spmod,
-            logLam2,
-            ntemplates,
-            logAge_grid,
-            metal_grid,
-            alpha_grid,
-            ncomb,
-            nAges,
-            nMetal,
-            nAlpha,
-        ) = prepTemplatesModule.prepareSpectralTemplateLibrary(
-            config,
-            lmin,
-            lmax,
-            velscale,
-            LSF_Data,
-            LSF_Templates,
-            module_used,
-            sortInGrid,
-        )
+        if config[module_used]["TEMPLATE_SET"].lower() == "bpass":
+            (
+                templates,
+                lamRange_spmod,
+                logLam2,
+                ntemplates,
+                logAge_grid,
+                metal_grid,
+                alpha_grid,
+                ncomb,
+                nAges,
+                nMetal,
+                nAlpha,
+            ) = prepTemplatesModule.prepareSpectralTemplateLibrary(
+                config,
+                lmin,
+                lmax,
+                velscale,
+                LSF_Data,
+                LSF_Templates,
+                module_used,
+                sortInGrid,
+                age_min_gyr=age_min_gyr,
+                age_max_gyr=age_max_gyr
+            )
+        else:
+            (
+                templates,
+                lamRange_spmod,
+                logLam2,
+                ntemplates,
+                logAge_grid,
+                metal_grid,
+                alpha_grid,
+                ncomb,
+                nAges,
+                nMetal,
+                nAlpha,
+            ) = prepTemplatesModule.prepareSpectralTemplateLibrary(
+                config,
+                lmin,
+                lmax,
+                velscale,
+                LSF_Data,
+                LSF_Templates,
+                module_used,
+                sortInGrid,
+            )
     except Exception as e:
         logging.critical(e, exc_info=True)
         message = "Routine '" + config[module_used]["TEMPLATE_SET"] + ".py' failed."
