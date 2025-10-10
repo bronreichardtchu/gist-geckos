@@ -87,7 +87,7 @@ def age_metal_alpha(passedFiles, age_min_gyr=None, age_max_gyr=None):
 
 
 def prepareSpectralTemplateLibrary(
-    config, lmin, lmax, velscale, LSF_Data, LSF_Templates, module_used, sortInGrid
+    config, lmin, lmax, velscale, LSF_Data, LSF_Templates, module_used, sortInGrid, age_min_gyr=None, age_max_gyr=None
 ):
     """
     Prepares the spectral template library. The templates are loaded from disk,
@@ -106,7 +106,19 @@ def prepareSpectralTemplateLibrary(
     )
 
     sp_models.sort()
-    ntemplates = 51 * len(sp_models)
+
+    # Determine number of templates, depending on if an age range is requested
+    if age_min_gyr is not None or age_max_gyr is not None:
+        age_years = np.arange(6, 11 + 0.1, 0.1)
+        age_gyr = 10 ** age_years / 1e9
+        age_mask = np.ones(len(age_gyr), dtype=bool)
+        if age_min_gyr is not None:
+            age_mask &= age_gyr >= age_min_gyr
+        if age_max_gyr is not None:
+            age_mask &= age_gyr <= age_max_gyr
+        ntemplates = np.sum(age_mask) * len(sp_models)
+    else:
+        ntemplates = 51 * len(sp_models)
 
     # Read data
     ssp = np.loadtxt(sp_models[0])
