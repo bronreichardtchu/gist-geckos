@@ -108,6 +108,8 @@ def prepareSpectralTemplateLibrary(
     sp_models.sort()
 
     # Determine number of templates, depending on if an age range is requested
+    # There are 51 ages in total from 0.001 Gyr to 100 Gyr in steps of 0.1 dex if
+    # no age range is requested
     if age_min_gyr is not None or age_max_gyr is not None:
         age_years = np.arange(6, 11 + 0.1, 0.1)
         age_gyr = 10 ** age_years / 1e9
@@ -118,6 +120,7 @@ def prepareSpectralTemplateLibrary(
             age_mask &= age_gyr <= age_max_gyr
         ntemplates = np.sum(age_mask) * len(sp_models)
     else:
+        age_mask = np.ones(51, dtype=bool)
         ntemplates = 51 * len(sp_models)
 
     # Read data
@@ -186,9 +189,12 @@ def prepareSpectralTemplateLibrary(
         for j, file in enumerate(sp_models):
             ssp_data = np.loadtxt(file)[idx_lam, 1:]
 
+            # Apply age mask
+            ssp_data = ssp_data[:, age_mask]
+
             for s in range(ssp_data.shape[1]):
                 ssp_data[:, s] = gaussian_filter1d(ssp_data[:, s], sigma)
-                templates[:, 51 * j + s], logLam_spmod, _ = log_rebin(
+                templates[:, np.sum(age_mask) * j + s], logLam_spmod, _ = log_rebin(
                     lamRange_spmod, ssp_data[:, s], velscale=velscale
                 )
 
@@ -250,6 +256,10 @@ def prepareSpectralTemplateLibrary(
                 # This sorts for ages
                 for j, filename in enumerate(files):
                     ssp_data = np.loadtxt(filename)[idx_lam, 1:]
+
+                    # Apply age mask
+                    ssp_data = ssp_data[:, age_mask]
+
                     for s in range(ssp_data.shape[1]):
                         ssp_data[:, s] = gaussian_filter1d(ssp_data[:, s], sigma)
                         sspNew, logLam2, _ = log_rebin(
@@ -262,9 +272,9 @@ def prepareSpectralTemplateLibrary(
 
                         # Normalise templates for light-weighted results
                         if config[module_used]["NORM_TEMP"] == "LIGHT":
-                            templates[:, 51 * j + s, k, i] = sspNew / np.mean(sspNew)
+                            templates[:, np.sum(age_mask) * j + s, k, i] = sspNew / np.mean(sspNew)
                         else:
-                            templates[:, 51 * j + s, k, i] = sspNew
+                            templates[:, np.sum(age_mask) * j + s, k, i] = sspNew
 
         # Normalise templates for mass-weighted results
         if config[module_used]["NORM_TEMP"] == "MASS":
